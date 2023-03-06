@@ -1,0 +1,44 @@
+.menu-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.line {
+  fill: white;
+  stroke: white;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.line1 {
+  stroke-dasharray: 0 16;
+  stroke-dashoffset: 0;
+}
+
+.line2 {
+  stroke-dasharray: 0 16;
+  stroke-dashoffset: 0;
+}
+
+.line3 {
+  stroke-dasharray: 0 16;
+  stroke-dashoffset: 0;
+}
+
+.menu-icon.active .line1 {
+  stroke-dasharray: 8 16;
+  stroke-dashoffset: -8;
+}
+
+.menu-icon.active .line2 {
+  stroke-dasharray: 0 16;
+  stroke-dashoffset: 0;
+}
+
+.menu-icon.active .line3 {
+  stroke-dasharray: 8 16;
+  stroke-dashoffset: -8;
+}

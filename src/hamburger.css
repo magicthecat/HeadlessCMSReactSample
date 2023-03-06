@@ -1,0 +1,104 @@
+nav {
+  display: flex;
+  align-items: center;
+}
+
+.hamburger-menu {
+  cursor: pointer;
+  width: 12px;
+  height: 12px;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 1rem;
+  background-color: blue;
+}
+
+.hamburger-menu div {
+  height: 3px;
+  background-color: #333;
+  border-radius: 5px;
+  transition: transform 0.2s;
+}
+
+.hamburger-menu div:first-child {
+  transform: translateY(0);
+}
+
+.hamburger-menu div:last-child {
+  transform: translateY(-7px);
+}
+
+.hamburger-menu.active div:first-child {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-menu.active div:last-child {
+  transform: translateY(0) rotate(-45deg);
+}
+
+.menu-overlay {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 300px;
+  background-color: #fff;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu .close {
+  cursor: pointer;
+  margin-bottom: 1rem;
+  align-self: flex-end;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.menu .close div {
+  height: 3px;
+  background-color: #333;
+  border-radius: 5px;
+  transition: transform 0.2s;
+}
+
+.menu .close div:first-child {
+  transform: translateY(0) rotate(45deg);
+}
+
+.menu .close div:last-child {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.menu ul li {
+  margin: 0;
+  padding: 0;
+}
+
+.menu ul li a {
+  color: #333;
+  font-weight: bold;
+ 
