@@ -1,0 +1,2 @@
+# HeadlessCMSReactSample
+Created with CodeSandbox
