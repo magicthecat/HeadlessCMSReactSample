@@ -62,6 +62,32 @@ const List = ({ id, isOrdered, itemlist }) => {
   );
 };
 
+const Card = ({ itemlist }) => {
+  const renderedItems = itemlist.map((item, index) => {
+    switch (item.type) {
+      case "heading":
+        return React.createElement(
+          `h${item.level}`,
+          { key: index },
+          item.content
+        );
+      case "paragraph":
+        return React.createElement("p", { key: index }, item.content);
+      case "link":
+        return React.createElement(
+          "a",
+          { key: index, href: item.href },
+          item.content
+        );
+      // Add additional cases here for other types of content objects
+      default:
+        return null; // Ignore unknown content types
+    }
+  });
+
+  return <section>{renderedItems}</section>;
+};
+
 const Image = ({ item }) => {
   return <img id={item.id} src={item.src} alt={item.alt} />;
 };
@@ -73,121 +99,6 @@ const Link = ({ item }) => {
     </a>
   );
 };
-
-const samplePages = [
-  {
-    id: 1,
-    title: "Homepage",
-    slug: "/",
-    content: [
-      {
-        id: 1,
-        type: "heading",
-        level: 1,
-        content: "Welcome to our website!"
-      },
-      {
-        id: 2,
-        type: "paragraph",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et turpis libero. Nulla facilisi. Donec vitae convallis orci, at luctus lacus. Phasellus eget nunc est. Cras et posuere felis, eu lacinia odio. Donec at quam et enim posuere tincidunt a a ante. Duis vitae ligula eu eros dignissim maximus. Praesent venenatis, sapien vel facilisis tristique, libero turpis eleifend justo, id rhoncus arcu augue quis mauris. Aenean pellentesque elit eget odio maximus iaculis. Sed porta a nibh ac sodales. Aliquam et lorem vitae nulla pretium aliquam."
-      },
-      {
-        id: 3,
-        type: "quote",
-        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        author: "John Doe"
-      },
-      {
-        id: 4,
-        type: "image",
-        src: "https://example.com/image.jpg",
-        alt: "Example Image",
-        caption: "This is an example image"
-      }
-    ]
-  },
-  {
-    id: "our-services",
-    title: "Our Services",
-    slug: "/our-services",
-    content: [
-      {
-        id: 1,
-        type: "heading",
-        level: 3,
-        content: "Our Services"
-      },
-      {
-        id: 2,
-        type: "paragraph",
-        content: "We offer a range of services to meet your needs."
-      },
-      {
-        id: 3,
-        type: "heading",
-        level: 3,
-        content: "Service 1"
-      },
-      {
-        id: 4,
-
-        type: "paragraph",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel metus malesuada, pulvinar nisl vel, fringilla felis."
-      },
-      {
-        id: 5,
-        type: "heading",
-        level: 3,
-        content: "Service 2"
-      },
-      {
-        id: 6,
-        type: "paragraph",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel metus malesuada, pulvinar nisl vel, fringilla felis."
-      },
-      {
-        id: 7,
-        type: "heading",
-        level: 3,
-        content: "Service 3"
-      },
-      {
-        id: 8,
-        type: "paragraph",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel metus malesuada, pulvinar nisl vel, fringilla felis."
-      }
-    ]
-  },
-  {
-    id: 2,
-    title: "About Us",
-    slug: "/about",
-    content: [
-      {
-        id: 1,
-        type: "heading",
-        level: 1,
-        content: "Who We Are"
-      },
-      {
-        id: 2,
-        type: "paragraph",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et turpis libero. Nulla facilisi. Donec vitae convallis orci, at luctus lacus. Phasellus eget nunc est. Cras et posuere felis, eu lacinia odio. Donec at quam et enim posuere tincidunt a a ante. Duis vitae ligula eu eros dignissim maximus. Praesent venenatis, sapien vel facilisis tristique, libero turpis eleifend justo, id rhoncus arcu augue quis mauris. Aenean pellentesque elit eget odio maximus iaculis. Sed porta a nibh ac sodales. Aliquam et lorem vitae nulla pretium aliquam."
-      },
-      {
-        id: 3,
-        type: "list",
-        ordered: false,
-        items: ["Item 1", "Item 2", "Item 3"]
-      }
-    ]
-  }
-];
 
 const ConvertToJSX = ({ data }) => {
   return data.map((item) => {
@@ -207,9 +118,10 @@ const ConvertToJSX = ({ data }) => {
       case "image":
         return <Image item={item} />;
 
-      //<img key={index} src={item.src} alt={item.alt} />;
       case "link":
         return <Link item={item} />;
+      case "card":
+        return <Card id={item.id} itemlist={item.items} />;
       default:
         return null;
     }
@@ -268,16 +180,157 @@ const Navigation = ({ pageData }) => {
   );
 };
 
+const PageTemplate = ({ page }) => {
+  return (
+    <Route key={page.slug} path={page.slug}>
+      <h1>{page.title}</h1>
+      <ConvertToJSX data={page.content} />
+    </Route>
+  );
+};
+
+const samplePages = [
+  {
+    id: 1,
+    title: "Homepage",
+    slug: "/",
+    content: [
+      {
+        id: 1,
+        type: "heading",
+        level: 1,
+        content: "Welcome to our website!",
+      },
+      {
+        id: 2,
+        type: "paragraph",
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et turpis libero. Nulla facilisi. Donec vitae convallis orci, at luctus lacus. Phasellus eget nunc est. Cras et posuere felis, eu lacinia odio. Donec at quam et enim posuere tincidunt a a ante. Duis vitae ligula eu eros dignissim maximus. Praesent venenatis, sapien vel facilisis tristique, libero turpis eleifend justo, id rhoncus arcu augue quis mauris. Aenean pellentesque elit eget odio maximus iaculis. Sed porta a nibh ac sodales. Aliquam et lorem vitae nulla pretium aliquam.",
+      },
+      {
+        id: 3,
+        type: "quote",
+        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        author: "John Doe",
+      },
+      {
+        id: 4,
+        type: "image",
+        src: "https://example.com/image.jpg",
+        alt: "Example Image",
+        caption: "This is an example image",
+      },
+      {
+        id: 5,
+        type: "card",
+        items: [
+          {
+            type: "heading",
+            level: 2,
+            content: "Card Heading",
+          },
+          {
+            type: "paragraph",
+            content: "This is a paragraph in the card.",
+          },
+          {
+            type: "link",
+            href: "https://example.com",
+            content: "Visit Example.com",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "our-services",
+    title: "Our Services",
+    slug: "/our-services",
+    content: [
+      {
+        id: 1,
+        type: "heading",
+        level: 3,
+        content: "Our Services",
+      },
+      {
+        id: 2,
+        type: "paragraph",
+        content: "We offer a range of services to meet your needs.",
+      },
+      {
+        id: 3,
+        type: "heading",
+        level: 3,
+        content: "Service 1",
+      },
+      {
+        id: 4,
+
+        type: "paragraph",
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel metus malesuada, pulvinar nisl vel, fringilla felis.",
+      },
+      {
+        id: 5,
+        type: "heading",
+        level: 3,
+        content: "Service 2",
+      },
+      {
+        id: 6,
+        type: "paragraph",
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel metus malesuada, pulvinar nisl vel, fringilla felis.",
+      },
+      {
+        id: 7,
+        type: "heading",
+        level: 3,
+        content: "Service 3",
+      },
+      {
+        id: 8,
+        type: "paragraph",
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel metus malesuada, pulvinar nisl vel, fringilla felis.",
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: "About Us",
+    slug: "/about",
+    content: [
+      {
+        id: 1,
+        type: "heading",
+        level: 1,
+        content: "Who We Are",
+      },
+      {
+        id: 2,
+        type: "paragraph",
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et turpis libero. Nulla facilisi. Donec vitae convallis orci, at luctus lacus. Phasellus eget nunc est. Cras et posuere felis, eu lacinia odio. Donec at quam et enim posuere tincidunt a a ante. Duis vitae ligula eu eros dignissim maximus. Praesent venenatis, sapien vel facilisis tristique, libero turpis eleifend justo, id rhoncus arcu augue quis mauris. Aenean pellentesque elit eget odio maximus iaculis. Sed porta a nibh ac sodales. Aliquam et lorem vitae nulla pretium aliquam.",
+      },
+      {
+        id: 3,
+        type: "list",
+        ordered: false,
+        items: ["Item 1", "Item 2", "Item 3"],
+      },
+    ],
+  },
+];
+
 export default function App() {
   return (
     <div>
       <Navigation pageData={samplePages} />
 
       {samplePages.map((page) => (
-        <Route key={page.slug} path={page.slug}>
-          <h1>{page.title}</h1>
-          <ConvertToJSX data={page.content} />
-        </Route>
+        <PageTemplate page={page} />
       ))}
     </div>
   );
