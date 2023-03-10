@@ -28,6 +28,120 @@ function BelowBreakpoint({ breakpoint, children }) {
   }
 }
 
+class StyleClass {
+  constructor() {
+    this.styles = {
+      heading: `
+        background-color: blue;
+        color: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+      `,
+      paragraph: `font-size: 1rem;
+    line-height: 1.5rem;
+    margin-bottom: 1rem;
+  `,
+    };
+  }
+
+  getCamelCaseStyle(name) {
+    const styleString = this.styles[name] || "";
+    const styleObject = {};
+    const properties = styleString.trim().split(";");
+    for (let i = 0; i < properties.length; i++) {
+      const property = properties[i].trim();
+      if (!property) continue;
+      const [key, value] = property.split(":");
+      const camelCaseKey = key.replace(/-([a-z])/g, (match, letter) =>
+        letter.toUpperCase()
+      );
+      styleObject[camelCaseKey] = value.trim();
+    }
+    return styleObject;
+  }
+}
+
+function convertCSS(cssString) {
+  const cssObj = {};
+  const cssRules = cssString.split(";");
+  cssRules.pop(); // Remove last empty element from split
+
+  cssRules.forEach((rule) => {
+    const [property, value] = rule.split(":").map((str) => str.trim());
+    const camelCaseProperty = property.replace(/-([a-z])/g, (match, char) =>
+      char.toUpperCase()
+    );
+    cssObj[camelCaseProperty] = value;
+  });
+
+  return cssObj;
+}
+
+const data = [
+  {
+    name: "The Shawshank Redemption",
+    type: "movie",
+    year: 1994,
+    director: "Frank Darabont",
+  },
+  {
+    name: "The Godfather",
+    type: "movie",
+    year: 1972,
+    director: "Francis Ford Coppola",
+  },
+  {
+    name: "The Dark Knight",
+    type: "movie",
+    year: 2008,
+    director: "Christopher Nolan",
+  },
+];
+
+function convertDataToCards(data) {
+  const cards = [];
+
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+    const cardItems = [];
+
+    for (const key in item) {
+      if (item.hasOwnProperty(key)) {
+        const currentItem = {
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          value: item[key],
+        };
+        const paragraphContent = `${currentItem.label}: ${currentItem.value}`;
+        cardItems.push({
+          type: "paragraph",
+          content: paragraphContent,
+        });
+      }
+    }
+
+    const card = {
+      id: i + 1,
+      type: "card",
+      items: [
+        {
+          type: "heading",
+          level: 2,
+          content: item.name,
+        },
+        ...cardItems,
+      ],
+    };
+
+    cards.push(card);
+  }
+
+  return cards;
+}
+
+const cards = convertDataToCards(data);
+
+console.log(cards);
+
 const Quote = ({ id, quote, author }) => {
   return (
     <div id={id} className="quote">
@@ -38,15 +152,31 @@ const Quote = ({ id, quote, author }) => {
 };
 
 const Heading = ({ item }) => {
-  return React.createElement(
+  const myStyles = new StyleClass();
+  const headingStyle = myStyles.getCamelCaseStyle(Heading.name.toLowerCase());
+
+  const component = React.createElement(
     `h${item.level}`,
-    { key: item.id, id: item.id },
+    { key: item.id, id: item.id, style: headingStyle },
     item.content
   );
+
+  return component;
 };
 
 const Paragraph = ({ id, content }) => {
-  return <p id={id}>{content}</p>;
+  const myStyles = new StyleClass();
+  const paragraphStyle = myStyles.getCamelCaseStyle(
+    Paragraph.name.toLowerCase()
+  );
+
+  return (
+    <>
+      <p id={id} style={paragraphStyle}>
+        {content}
+      </p>
+    </>
+  );
 };
 
 const List = ({ id, isOrdered, itemlist }) => {
@@ -62,32 +192,6 @@ const List = ({ id, isOrdered, itemlist }) => {
   );
 };
 
-const Card = ({ itemlist }) => {
-  const renderedItems = itemlist.map((item, index) => {
-    switch (item.type) {
-      case "heading":
-        return React.createElement(
-          `h${item.level}`,
-          { key: index },
-          item.content
-        );
-      case "paragraph":
-        return React.createElement("p", { key: index }, item.content);
-      case "link":
-        return React.createElement(
-          "a",
-          { key: index, href: item.href },
-          item.content
-        );
-      // Add additional cases here for other types of content objects
-      default:
-        return null; // Ignore unknown content types
-    }
-  });
-
-  return <section>{renderedItems}</section>;
-};
-
 const Image = ({ item }) => {
   return <img id={item.id} src={item.src} alt={item.alt} />;
 };
@@ -98,6 +202,25 @@ const Link = ({ item }) => {
       {item.content}
     </a>
   );
+};
+
+const Card = ({ itemlist }) => {
+  const className = Card.name.toLowerCase();
+  const renderedItems = itemlist.map((item, index) => {
+    switch (item.type) {
+      case "heading":
+        return <Heading item={item} />;
+      case "paragraph":
+        return <Paragraph content={item.content} id={item.id} />;
+      case "link":
+        return <Link item={item} />;
+      // Add additional cases here for other types of content objects
+      default:
+        return null; // Ignore unknown content types
+    }
+  });
+
+  return <section className={className}>{renderedItems}</section>;
 };
 
 const ConvertToJSX = ({ data }) => {
@@ -169,7 +292,7 @@ const Navigation = ({ pageData }) => {
       <BelowBreakpoint breakpoint={768}>
         <HamburgerMenu samplePages={samplePages} />
         <ul className="navbar-nav">
-          {samplePages.map((page) => (
+          {pageData.map((page) => (
             <li className="nav-item" key={page.slug}>
               <PageLink href={page.slug}>{page.title}</PageLink>
             </li>
@@ -219,6 +342,26 @@ const samplePages = [
         src: "https://example.com/image.jpg",
         alt: "Example Image",
         caption: "This is an example image",
+      },
+      {
+        id: 2,
+        type: "card",
+        items: [
+          { type: "heading", level: 2, content: "The Godfather" },
+          { type: "paragraph", content: "Type: movie" },
+          { type: "paragraph", content: "Year: 1972" },
+          { type: "paragraph", content: "Director: Francis Ford Coppola" },
+        ],
+      },
+      {
+        id: 3,
+        type: "card",
+        items: [
+          { type: "heading", level: 2, content: "The Dark Knight" },
+          { type: "paragraph", content: "Type: movie" },
+          { type: "paragraph", content: "Year: 2008" },
+          { type: "paragraph", content: "Director: Christopher Nolan" },
+        ],
       },
       {
         id: 5,
@@ -325,10 +468,15 @@ const samplePages = [
 ];
 
 export default function App() {
+  const childStyles = [];
+
+  function collectChildStyles(childStyleString) {
+    childStyles.push(childStyleString);
+  }
+
   return (
     <div>
       <Navigation pageData={samplePages} />
-
       {samplePages.map((page) => (
         <PageTemplate page={page} />
       ))}

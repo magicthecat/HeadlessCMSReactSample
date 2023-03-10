@@ -3,6 +3,12 @@
   text-align: center;
 }
 
+.card {
+  border: #333;
+  border-style: solid;
+  padding: 5%;
+}
+
 .quote {
   background-color: #f5f5f5;
   padding: 20px;
